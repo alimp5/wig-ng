@@ -20,7 +20,7 @@
 
 import struct
 
-from Queue import Empty
+from queue import Empty
 from multiprocessing import Event
 from collections import OrderedDict
 
@@ -105,6 +105,7 @@ class InformationElementsStats(WigProcess):
                 try:
                     frame = self.__queue__.get(timeout=5)
                     try:
+                        print(repr(frame))
                         self.decoder.decode(frame)
                     except Exception:
                         self.__malformed__ +=1
@@ -128,8 +129,8 @@ class InformationElementsStats(WigProcess):
 
         aux =  OrderedDict()
         aux['Module'] = self.__module_name__
-        for tag_id, count in self.__tag_stats__.items():
-            if tag_id in ieee80211.tag_strings.keys():
+        for tag_id, count in list(self.__tag_stats__.items()):
+            if tag_id in list(ieee80211.tag_strings.keys()):
                 aux['TAG %02X [%s]' % (tag_id, ieee80211.tag_strings[tag_id])] = count
             else:
                 aux['TAG %02X' % tag_id] = count
@@ -148,12 +149,13 @@ class InformationElementsStats(WigProcess):
                     tag, length, value = ie
                     # We avoid adding information elements with invalid length.
                     if length == len(value) and length > 0:
-                        if tag not in self.__tag_stats__.keys():
+                        if tag not in list(self.__tag_stats__.keys()):
                             self.__tag_stats__[tag] = 1
                         else:
                             self.__tag_stats__[tag] += 1
-        except Exception, e:
+        except Exception as e:
             self.__output__.put({'Exception': str(e)})
+            print(traceback.format_exc())
 
     @staticmethod
     def get_ie_list(buff):
@@ -164,8 +166,10 @@ class InformationElementsStats(WigProcess):
         idx = 0
         invalid = 0
         while True:
-            tag = struct.unpack("B", buff[idx])[0]
-            length = struct.unpack("B", buff[idx+1])[0]
+            # tag = struct.unpack("B", buff[idx])[0]
+            tag = buff[idx]
+            # length = struct.unpack("B", buff[idx+1])[0]
+            length = buff[idx+1]
             value = buff[idx+2:idx+2+length]
             if length == 0 or length > len(value):
                 invalid += 1

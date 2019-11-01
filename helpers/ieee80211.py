@@ -455,14 +455,14 @@ def get_frame_type(frame_control):
     """
     Returns frame type.
     """
-    return (ord(frame_control[0]) & 0b00001100) >> 2
+    return frame_control[0] & 0b00001100 >> 2
 
 
 def get_frame_subtype(frame_control):
     """
     Returns frame subtype.
     """
-    return (ord(frame_control[0]) & 0b11110000) >> 4
+    return frame_control[0] & 0b11110000 >> 4
 
 
 def get_security(frame):

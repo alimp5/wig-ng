@@ -24,7 +24,7 @@ import traceback
 
 import pcapy
 
-from Queue import Empty
+from queue import Empty
 from collections import OrderedDict
 
 from multiprocessing import Event, Queue, TimeoutError
@@ -35,12 +35,12 @@ from helpers.output import writer
 from helpers.Processes import WigProcess
 from producers.base import FINITE_TYPE, INFINITE_TYPE
 
-from wps import WiFiProtectedSetup
-from uncommon import InformationElementsStats
-from hp import HewlettPackardVendorSpecificTypeZero
-from awdl import AppleWirelessDirectLink
-from p2p import WiFiDirect
-from ccx import CiscoClientExtensions
+from .wps import WiFiProtectedSetup
+from .uncommon import InformationElementsStats
+from .hp import HewlettPackardVendorSpecificTypeZero
+from .awdl import AppleWirelessDirectLink
+from .p2p import WiFiDirect
+from .ccx import CiscoClientExtensions
 
 
 class Mediator(WigProcess):
@@ -115,6 +115,7 @@ class Mediator(WigProcess):
                     if frame_type in consumer.get_frame_type_filter():
                         frame_subtype = ieee80211.get_frame_subtype(frame)
                         if frame_subtype in consumer.get_frame_subtype_filter():
+                            print("fafafa: %s" % consumer)
                             consumer_queue.put(frame)
                     # If filters are empty we put the frame into the queue.
                     if not consumer.get_frame_type_filter() and \
@@ -123,8 +124,9 @@ class Mediator(WigProcess):
         # Ignore SIGINT signal, this is handled by parent.
         except KeyboardInterrupt:
             pass
-        except Exception, e:
+        except Exception as e:
             self.__output_queue__.put({'Exception': str(e)})
+            print(traceback.format_exc())
         finally:
             # We need to wait for consumers to finish.
             self.__output_queue__.put({' ': 'Waiting for modules to finish. Please wait...'})
@@ -143,8 +145,9 @@ class Mediator(WigProcess):
                     time.sleep(5)
                 # except KeyboardInterrupt:
                     # traceback.print_stack()
-                except Exception, e:
+                except Exception as e:
                     self.__output_queue__.put({'Exception': str(e)})
+                    print(traceback.format_exc())
 
     def run_from_infinite_producers(self):
         """
@@ -184,8 +187,9 @@ class Mediator(WigProcess):
         # Ignore SIGINT signal, this is handled by parent.
         except KeyboardInterrupt:
             pass
-        except Exception, e:
+        except Exception as e:
             self.__output_queue__.put({'Exception': str(e)})
+            print(traceback.format_exc())
         finally:
             for item in consumer_list:
                 consumer = item[0]
@@ -247,11 +251,11 @@ class OutputManager(WigProcess):
         """
         TODO: Documentation
         """
-        for k, v in output_items.items():
+        for k, v in list(output_items.items()):
             if len(k.strip()) == 0:
-                print("%s" % v)
+                print(("%s" % v))
             else:
-                print("%s: %s" % (k, v))
+                print(("%s: %s" % (k, v)))
         print("")  # Add empty line on bottom of item output.
 
     def shutdown(self):
