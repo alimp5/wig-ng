@@ -105,7 +105,6 @@ class InformationElementsStats(WigProcess):
                 try:
                     frame = self.__queue__.get(timeout=5)
                     try:
-                        print(repr(frame))
                         self.decoder.decode(frame)
                     except Exception:
                         self.__malformed__ +=1

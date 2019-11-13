@@ -78,9 +78,7 @@ class WiFiProtectedSetup(WigProcess):
                 try:
                     frame = self.__queue__.get(timeout=5)
                     try:
-                        print(repr(frame))
                         self.decoder.decode(frame)
-                        self.__output__.put("wps: after decode")
                     except Exception as e:
                         self.__output__.put({'Exception': str(e)})
                         self.__output__.put(traceback.format_exc())
@@ -100,7 +98,7 @@ class WiFiProtectedSetup(WigProcess):
                     pass
                 except Exception as e:
                     self.__output__.put({'Exception': str(e)})
-                    self.__output__.put(traceback.format_exc())
+                    self.__output__.put({'': traceback.format_exc()})
         # Ignore SIGINT signal, this is handled by parent.
         except KeyboardInterrupt:
             pass
@@ -128,7 +126,7 @@ class WiFiProtectedSetup(WigProcess):
                     oui, data = item
                     vs_type = data[0]
                     length = struct.pack("B", len(oui + data))
-                    raw_data = wps.WPSInformationElement.VENDOR_SPECIFIC_IE_ID + length + oui + data
+                    raw_data = bytes(wps.WPSInformationElement.VENDOR_SPECIFIC_IE_ID) + length + oui + data
                     if oui == wps.WPSInformationElement.WPS_OUI and vs_type == wps.WPSInformationElement.WPS_OUI_TYPE:
                         info_items = dict()
                         if ssid:

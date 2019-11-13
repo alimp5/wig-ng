@@ -160,10 +160,12 @@ class WPSInformationElement(object):
     TLV_SIZE_LENGTH = 2
     WPS_IE_SIZE_LENGTH = 1
 
-    VENDOR_SPECIFIC_IE_ID = "\xdd"  # Vendor Specific ID
-    WPS_OUI = "\x00\x50\xf2"  # Microsoft OUI (WiFi Alliance)
-    WPS_OUI_TYPE = "\x04"  # WPS type
-    FIXED_DATA_LENGTH = len(VENDOR_SPECIFIC_IE_ID) + WPS_IE_SIZE_LENGTH + len(WPS_OUI) + len(WPS_OUI_TYPE)
+    VENDOR_SPECIFIC_IE_ID = 221  # Vendor Specific ID - 0xdd
+    VENDOR_SPECIFIC_IE_ID_LENGTH = 1
+    WPS_OUI = b"\x00\x50\xf2"  # Microsoft OUI (WiFi Alliance)
+    WPS_OUI_TYPE = 4  # WPS type - 0x04
+    WPS_OUT_TYPE_LENGTH = 1
+    FIXED_DATA_LENGTH = VENDOR_SPECIFIC_IE_ID_LENGTH + WPS_IE_SIZE_LENGTH + len(WPS_OUI) + WPS_OUT_TYPE_LENGTH
 
     def __init__(self, buff):
         self.buffer = buff
@@ -183,6 +185,8 @@ class WPSInformationElement(object):
         idx = 0
         if self.buffer_length <= self.FIXED_DATA_LENGTH:
             raise InvalidWPSInformationElement("Invalid buffer length.")
+        print(repr(self.buffer[idx]))
+        print(repr(self.VENDOR_SPECIFIC_IE_ID))
         if not self.buffer[idx] == self.VENDOR_SPECIFIC_IE_ID:
             raise InvalidWPSInformationElement("Invalid WPS information element id.")
         idx += len(self.VENDOR_SPECIFIC_IE_ID) + self.WPS_IE_SIZE_LENGTH

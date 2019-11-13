@@ -64,7 +64,7 @@ class Mediator(WigProcess):
                                InformationElementsStats,
                                CiscoClientExtensions,
                                WiFiProtectedSetup,
-                               WiFiDirect,
+                               # WiFiDirect,
                                HewlettPackardVendorSpecificTypeZero,
                                AppleWirelessDirectLink]
 
@@ -115,7 +115,6 @@ class Mediator(WigProcess):
                     if frame_type in consumer.get_frame_type_filter():
                         frame_subtype = ieee80211.get_frame_subtype(frame)
                         if frame_subtype in consumer.get_frame_subtype_filter():
-                            print("fafafa: %s" % consumer)
                             consumer_queue.put(frame)
                     # If filters are empty we put the frame into the queue.
                     if not consumer.get_frame_type_filter() and \
@@ -251,12 +250,15 @@ class OutputManager(WigProcess):
         """
         TODO: Documentation
         """
-        for k, v in list(output_items.items()):
-            if len(k.strip()) == 0:
-                print(("%s" % v))
-            else:
-                print(("%s: %s" % (k, v)))
-        print("")  # Add empty line on bottom of item output.
+        try:
+            for k, v in list(output_items.items()):
+                if len(k.strip()) == 0:
+                    print(("%s" % v))
+                else:
+                    print(("%s: %s" % (k, v)))
+            print("")  # Add empty line on bottom of item output.
+        except Exception as e:
+            print(str(e))
 
     def shutdown(self):
         """
